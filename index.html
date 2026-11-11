@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1c2733">
+<title>Maintenance Visit Report</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<style>
+:root{
+  --ink:#1c2733; --ink2:#4a5868; --muted:#6b7685; --line:#d5dbe1; --panel:#f3f5f7; --card:#fff;
+  --accent:#2563a8; --accent-ink:#fff;
+  --ok:#2e7d4f; --ok-bg:#e6f3ea;
+  --attn:#b42318; --attn-bg:#fde8e6;
+  --rem:#a15c07; --rem-bg:#fdf0dc;
+  --fix:#0f6e6a; --fix-bg:#ddf2f0;
+  --na:#6b7685; --na-bg:#eceff2; --unch:#9aa4af;
+  --danger:#b42318; --r:10px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--panel);color:var(--ink);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;-webkit-text-size-adjust:100%}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.wrap{max-width:860px;margin:0 auto;padding:12px 12px 96px}
+.bar{position:sticky;top:0;z-index:5;background:var(--ink);color:#fff;padding:10px 12px;padding-top:calc(10px + env(safe-area-inset-top,0px));margin-top:calc(-1 * env(safe-area-inset-top,0px))}
+.bar .in{max-width:860px;margin:0 auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.bar h1{font-size:1.05rem;margin:0;flex:1;min-width:120px;font-weight:650}
+.bar .save{font-size:.8rem;color:#b8c3cf}
+.btn{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:9px 14px;min-height:42px;font-weight:600}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.ghost{background:transparent;border-color:#5b6b7c;color:#fff}
+.btn.sm{padding:5px 10px;min-height:34px;font-size:.88rem}
+.btn.del{color:var(--danger)}
+.btn:disabled{opacity:.5}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin:12px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:.85rem;color:var(--ink2);font-weight:600}
+input[type=text],input[type=date],select,textarea{border:1px solid var(--line);border-radius:8px;padding:9px 10px;background:#fff;min-height:42px;width:100%;font-weight:400;color:var(--ink)}
+textarea{min-height:64px;resize:vertical}
+h2{font-size:1.1rem;margin:0 0 8px}
+.muted{color:var(--muted)}
+.small{font-size:.85rem}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.room-h{display:flex;gap:8px;align-items:center}
+.room-h input{font-weight:700;font-size:1.05rem;flex:1;min-width:0}
+.tog{width:42px;height:42px;border:1px solid var(--line);border-radius:8px;background:#fff;font-size:1rem}
+.counts{font-size:.8rem;color:var(--muted);margin:6px 0 0}
+.dev{border-top:2px solid var(--ink);margin-top:16px;padding-top:10px}
+.dev-h{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.dev-h b{font-size:1rem}
+.dev-h input{flex:1;min-width:120px;min-height:36px;padding:6px 8px}
+details.asset{margin:8px 0 2px;border:1px solid var(--line);border-radius:8px;background:#fff}
+details.asset summary{padding:8px 10px;font-size:.88rem;font-weight:600;color:var(--ink2);cursor:pointer}
+details.asset .grid{padding:0 10px 10px;grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
+.chk{border-left:5px solid var(--unch);background:#fafbfc;border-radius:0 8px 8px 0;padding:10px 10px 10px 12px;margin:10px 0}
+.chk[data-s=ok]{border-left-color:var(--ok)}
+.chk[data-s=attn]{border-left-color:var(--attn)}
+.chk[data-s=remedial]{border-left-color:var(--rem)}
+.chk[data-s=fixed]{border-left-color:var(--fix)}
+.chk[data-s=na]{border-left-color:var(--na)}
+.chk-h{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}
+.chk-h .nm{font-weight:650}
+.seg{display:grid;grid-template-columns:repeat(6,auto);border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--line);gap:1px}
+.seg button{border:0;background:#fff;padding:8px 10px;min-height:40px;font-size:.86rem;font-weight:600;color:var(--ink2)}
+.seg button[aria-pressed=true][data-v=ok]{background:var(--ok);color:#fff}
+.seg button[aria-pressed=true][data-v=attn]{background:var(--attn);color:#fff}
+.seg button[aria-pressed=true][data-v=remedial]{background:var(--rem);color:#fff}
+.seg button[aria-pressed=true][data-v=fixed]{background:var(--fix);color:#fff}
+.seg button[aria-pressed=true][data-v=na]{background:var(--na);color:#fff}
+.seg button[aria-pressed=true][data-v=unchecked]{background:var(--ink2);color:#fff}
+@media (max-width:560px){.seg{grid-template-columns:repeat(3,1fr);width:100%}}
+.chk textarea{margin-top:8px}
+.fault{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px;margin-top:8px}
+.fault .wide{grid-column:1/-1}
+.fault textarea{margin-top:0;min-height:52px}
+.ph{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.ph figure{margin:0;position:relative;width:76px;height:76px}
+.ph img{width:100%;height:100%;object-fit:cover;border-radius:6px;border:1px solid var(--line)}
+.ph .x{position:absolute;top:-8px;right:-8px;width:28px;height:28px;border-radius:50%;border:2px solid #fff;background:var(--danger);color:#fff;font-weight:700;line-height:1;padding:0}
+.photo-btns{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.photo-btns label{display:inline-flex;align-items:center;border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 12px;min-height:38px;font-size:.88rem;font-weight:600;cursor:pointer}
+.photo-btns input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.add-dev{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.add-dev select{flex:1;min-width:160px}
+.addchk{display:flex;gap:8px;margin-top:6px}
+.addchk input{flex:1;min-height:36px;padding:6px 8px}
+.big-add{width:100%;border:2px dashed var(--line);background:transparent;border-radius:var(--r);padding:16px;font-weight:650;color:var(--ink2);margin-top:4px}
+.visit{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+.visit .t{font-weight:650}
+.empty{text-align:center;padding:28px 12px;color:var(--ink2)}
+.lib-type{border-top:1px solid var(--line);padding:12px 0}
+.lib-type:first-of-type{border-top:0}
+.lib-chk{display:flex;gap:6px;margin:6px 0}
+.lib-chk input{flex:1;min-height:36px;padding:6px 8px}
+.sigs{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.sigpad{position:relative}
+.sigpad canvas{width:100%;height:150px;border:1px solid var(--line);border-radius:8px;background:#fff;touch-action:none;display:block}
+.sigpad .hint{position:absolute;left:12px;bottom:10px;font-size:.8rem;color:var(--muted);pointer-events:none}
+.toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:8px;font-size:.9rem;z-index:20;max-width:90vw}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.note{background:#eef4fb;border:1px solid #c9dbef;border-radius:8px;padding:10px 12px;font-size:.88rem}
+
+/* report */
+.rep{background:#fff;max-width:860px;margin:12px auto;padding:28px;border:1px solid var(--line);color:#1c2733}
+.rep h1{font-size:1.6rem;margin:0 0 2px}
+.rep h2{font-size:1.15rem;margin:26px 0 8px;padding-bottom:4px;border-bottom:2px solid var(--ink)}
+.rep h3{font-size:1rem;margin:16px 0 4px}
+.rep dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:6px 18px;margin:14px 0 0}
+.rep dl.asset{margin:0 0 6px;font-size:.85rem;gap:2px 18px}
+.rep dt{font-size:.78rem;color:var(--muted)}
+.rep dd{margin:0;font-weight:600}
+.rep table{width:100%;border-collapse:collapse;font-size:.9rem}
+.rep th,.rep td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.rep th{font-size:.78rem;color:var(--muted);font-weight:600}
+.rep .sub{display:block;font-size:.8rem;color:var(--muted)}
+.rep .kv{display:block;margin-top:3px}
+.rep .kv b{font-weight:600;color:var(--ink2)}
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+.stats div{border:1px solid var(--line);border-radius:8px;padding:8px 12px;min-width:86px}
+.stats b{display:block;font-size:1.3rem}
+.pill{display:inline-block;padding:2px 8px;border-radius:99px;font-size:.78rem;font-weight:700;white-space:nowrap}
+.p-ok{background:var(--ok-bg);color:var(--ok)}
+.p-attn{background:var(--attn-bg);color:var(--attn)}
+.p-remedial{background:var(--rem-bg);color:var(--rem)}
+.p-fixed{background:var(--fix-bg);color:var(--fix)}
+.p-na{background:var(--na-bg);color:var(--na)}
+.p-unchecked{background:#fff;color:var(--muted);border:1px solid var(--line)}
+.rphotos{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.rphotos img{width:min(150px,100%);height:auto;aspect-ratio:4/3;object-fit:cover;border:1px solid var(--line);border-radius:4px}
+.rsign{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
+.rsign img{max-width:100%;height:90px;object-fit:contain;object-position:left;border-bottom:1px solid var(--ink);display:block}
+.rsign .blank{height:90px;border-bottom:1px solid var(--ink)}
+.rep .end{text-align:center;color:var(--muted);font-size:.85rem;margin-top:36px;border-top:1px solid var(--line);padding-top:12px}
+.wrapcell{white-space:pre-wrap;overflow-wrap:anywhere}
+@media (max-width:520px){.rep{padding:16px;margin:8px}.rep th,.rep td{padding:6px 4px}}
+@media print{
+  html,body{background:#fff}
+  .noprint,.bar,.toast{display:none!important}
+  .rep{border:0;margin:0;padding:0;max-width:none}
+  .rep tr,.rphotos img,.devblock,.rsign{break-inside:avoid}
+  .rep h2,.rep h3{break-after:avoid}
+  @page{margin:14mm}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+<script src="config.js"></script>
+</head>
+<body>
+<div id="app"></div>
+<div id="toast" class="toast" hidden role="status" aria-live="polite"></div>
+
+<script>
+"use strict";
+const CFG=window.MVR_CONFIG||{};
+
+/* ---------- Default device library ----------
+   Your original list, extended with checks from the ITA Preventative Maintenance Checklist. */
+const LIB_VERSION=2;
+const DEFAULT_LIB=[
+  {name:"System (whole room)",checks:["Full operational and signal-flow check","Accessible connections inspected and reseated","Network connectivity and remote access","Firmware and software updated","Configuration backed up (DSP, control processor)","System documentation updated"]},
+  {name:"Mics",checks:["Audio","Gain, clarity and dropouts","Mute behaviour (manual and automatic)","Batteries and charging (wireless)","Pairing and RF performance (wireless)"]},
+  {name:"Camera",checks:["PTZ","Presets","AF","Teams I/P","Brightness, contrast and colour","Output resolution and frame rate","Lens cleaned"]},
+  {name:"Mixer",checks:["Levels","Teams I/P","DSP settings and routing"]},
+  {name:"Speakers",checks:["Full-range coverage","Distortion, hum or buzz"]},
+  {name:"Amps",checks:["Operation","Signal levels and output stability","Distortion, hum or buzz"]},
+  {name:"Displays",checks:["Operation","Power on/off via control system","Input switching","Damage, dead pixels or burn-in","Remote batteries"]},
+  {name:"Projector",checks:["Lamp or laser runtime recorded","Filters inspected and cleaned","Alignment and focus","Lens shift, zoom and keystone","Screen motor and surface","Remote batteries"]},
+  {name:"Video switching and extenders",checks:["Video paths and switching","EDID and resolution","Extender link stability","Fans and ventilation"]},
+  {name:"Control system and touch panel",checks:["Processor status and firmware","Communication with controlled devices","Touch responsiveness","Presets and sequences","Panel wear and calibration","Network / IP control","Scheduled events (auto-off)","Program and configuration backed up"]},
+  {name:"Rack and power",checks:["Surge protection","Power sequencing","Cable management"]},
+  {name:"Recorder",checks:["Operation"]},
+  {name:"Laptop",checks:["Operation"]}
+];
+const STATUSES=[
+  ["unchecked","Not checked","–","Not checked yet"],
+  ["ok","OK","OK","Working correctly"],
+  ["attn","Needs attention","Attention","Fault or issue found, not fixed on this visit"],
+  ["remedial","Remedial","Remedial","Temporary fix applied on site, permanent fix still needed"],
+  ["fixed","Fixed","Fixed","Fault found and fixed on this visit"],
+  ["na","N/A","N/A","Not applicable"]];
+const LABEL=Object.fromEntries(STATUSES.map(s=>[s[0],s[1]]));
+const ZERO=()=>Object.fromEntries(STATUSES.map(s=>[s[0],0]));
+const ASSET=[["make","Make"],["model","Model"],["serial","Serial number"],["fwBefore","Firmware before"],["fwAfter","Firmware after"]];
+const DRIVE_SCOPE="https://www.googleapis.com/auth/drive";
+
+const uid=()=>Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const todayISO=()=>{const d=new Date();return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10)};
+const ukDate=iso=>{if(!iso)return"";const [y,m,d]=String(iso).split("-");return d&&m&&y?`${d}/${m}/${y}`:iso};
+const ukDateTime=ms=>ms?new Date(ms).toLocaleString("en-GB",{dateStyle:"short",timeStyle:"short"}):"";
+const libFromDefaults=()=>DEFAULT_LIB.map(t=>({id:uid(),name:t.name,checks:[...t.checks]}));
+
+/* ---------- Storage (IndexedDB) ---------- */
+let DB;
+function openDB(){return new Promise((res,rej)=>{const r=indexedDB.open("maintenance-visit-report",1);
+  r.onupgradeneeded=()=>{const d=r.result;d.createObjectStore("visits",{keyPath:"id"});d.createObjectStore("settings")};
+  r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
+function tx(store,mode,fn){return new Promise((res,rej)=>{const t=DB.transaction(store,mode);const out=fn(t.objectStore(store));t.oncomplete=()=>res(out instanceof IDBRequest?out.result:undefined);t.onerror=()=>rej(t.error)})}
+const dbGetAll=()=>tx("visits","readonly",s=>s.getAll());
+const dbPut=v=>tx("visits","readwrite",s=>{s.put(v)});
+const dbDel=id=>tx("visits","readwrite",s=>{s.delete(id)});
+const setGet=k=>tx("settings","readonly",s=>s.get(k));
+const setPut=(k,v)=>tx("settings","readwrite",s=>{s.put(v,k)});
+
+/* ---------- State ---------- */
+const S={view:"home",visits:[],cur:null,lib:[],saved:true,from:"home",drive:{clientId:"",folderId:"",folderName:""}};
+let saveTimer;
+function touch(){if(!S.cur)return;S.cur.updated=Date.now();S.saved=false;setSaveLabel();clearTimeout(saveTimer);saveTimer=setTimeout(flush,400)}
+async function flush(){clearTimeout(saveTimer);if(!S.cur||S.saved)return;try{await dbPut(S.cur);S.saved=true;setSaveLabel()}catch(e){toast("Could not save on this device: "+e.message)}}
+function setSaveLabel(){const el=document.getElementById("saveState");if(el)el.textContent=S.saved?"Saved on this device":"Saving…"}
+const saveLib=()=>setPut("lib",S.lib);
+window.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden")flush()});
+window.addEventListener("pagehide",flush);
+function toast(msg,ms=3500){const t=document.getElementById("toast");t.textContent=msg;t.hidden=false;clearTimeout(t._t);t._t=setTimeout(()=>t.hidden=true,ms)}
+
+function newVisit(){return{id:uid(),created:Date.now(),updated:Date.now(),
+  meta:{client:"",site:"",date:todayISO(),engineer:"",ref:"",notes:""},
+  rooms:[{id:uid(),name:"Room 1",open:true,devices:[]}],
+  sign:{engName:"",engSig:"",cliName:"",cliSig:"",date:todayISO()},drive:{}}}
+function fixVisit(v){v.sign=v.sign||{engName:"",engSig:"",cliName:"",cliSig:"",date:v.meta.date||todayISO()};v.drive=v.drive||{};
+  v.rooms.forEach(r=>r.devices.forEach(d=>{d.asset=d.asset||{};d.checks.forEach(k=>{k.photos=k.photos||[]})}));return v}
+const newCheck=n=>({id:uid(),name:n,status:"unchecked",comments:"",action:"",recommendation:"",owner:"",target:"",photos:[]});
+const deviceFromType=t=>({id:uid(),type:t.name,label:"",asset:{},checks:t.checks.filter(Boolean).map(newCheck)});
+
+const findRoom=id=>S.cur.rooms.find(r=>r.id===id);
+const findDev=(rid,did)=>findRoom(rid)?.devices.find(d=>d.id===did);
+const findChk=(rid,did,cid)=>findDev(rid,did)?.checks.find(c=>c.id===cid);
+function roomCounts(r){const c=ZERO();r.devices.forEach(d=>d.checks.forEach(k=>c[k.status]++));return c}
+function allChecks(v){const o=[];v.rooms.forEach(r=>r.devices.forEach(d=>d.checks.forEach(k=>o.push([r,d,k]))));return o}
+const devName=d=>d.label?`${d.type} (${d.label})`:d.type;
+function countsText(c){const tot=Object.values(c).reduce((a,b)=>a+b,0);if(!tot)return"No devices yet";
+  return `${tot} checks: `+STATUSES.filter(s=>c[s[0]]).map(s=>`${c[s[0]]} ${/^[A-Z/]+$/.test(s[1])?s[1]:s[1].toLowerCase()}`).join(", ")}
+
+/* ---------- Photos ---------- */
+async function compress(file,max=1600,q=.8){
+  const url=URL.createObjectURL(file);
+  try{const img=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=()=>rej(new Error("Could not read that image"));i.src=url});
+    const sc=Math.min(1,max/Math.max(img.naturalWidth,img.naturalHeight));
+    const c=document.createElement("canvas");c.width=Math.round(img.naturalWidth*sc);c.height=Math.round(img.naturalHeight*sc);
+    c.getContext("2d").drawImage(img,0,0,c.width,c.height);return c.toDataURL("image/jpeg",q);
+  }finally{URL.revokeObjectURL(url)}
+}
+
+/* ---------- Render ---------- */
+const app=document.getElementById("app");
+function render(){
+  const y=scrollY;
+  app.innerHTML=S.view==="home"?homeHTML():S.view==="edit"?editHTML():S.view==="lib"?libHTML():S.view==="settings"?settingsHTML():reportPage();
+  setSaveLabel();if(S.view==="edit")initSigs();
+  scrollTo(0,y);
+}
+const go=v=>{S.view=v;app.innerHTML="";render();scrollTo(0,0)};
+
+function homeHTML(){
+  const vs=[...S.visits].sort((a,b)=>b.updated-a.updated);
+  return `<header class="bar"><div class="in"><h1>Maintenance visits</h1>
+    <button class="btn ghost sm" data-a="lib">Device library</button><button class="btn ghost sm" data-a="settings">Settings</button></div></header>
+  <main class="wrap">
+    <div class="row" style="margin-top:4px">
+      <button class="btn pri" data-a="new">New visit</button>
+      <label class="btn" style="display:inline-flex;align-items:center">Open backup<input type="file" accept=".json,application/json" class="sr" data-a="import"></label>
+    </div>
+    ${vs.length?vs.map(v=>{const c=ZERO();allChecks(v).forEach(x=>c[x[2].status]++);
+      const flags=[c.attn&&`<span style="color:var(--attn);font-weight:700">${c.attn} need attention</span>`,c.remedial&&`<span style="color:var(--rem);font-weight:700">${c.remedial} remedial</span>`].filter(Boolean).join(", ");
+      return `<div class="card visit"><div><div class="t">${esc(v.meta.client||"Untitled visit")}${v.meta.site?` – ${esc(v.meta.site)}`:""}</div>
+      <div class="muted small">${esc(ukDate(v.meta.date))}, ${v.rooms.length} room${v.rooms.length===1?"":"s"}${flags?", "+flags:""}</div>
+      ${v.drive&&v.drive.uploaded?`<div class="muted small">Saved to Google Drive ${esc(ukDateTime(v.drive.uploaded))}</div>`:""}</div>
+      <div class="row"><button class="btn sm pri" data-a="open" data-id="${v.id}">Open</button><button class="btn sm del" data-a="delvisit" data-id="${v.id}">Delete</button></div></div>`}).join("")
+    :`<div class="card empty">No visits on this device yet. Start one with <b>New visit</b>, or open a backup file.</div>`}
+    <p class="muted small" style="margin-top:18px">Visits are stored in this browser on this device. Use <b>Save to Google Drive</b> or <b>Save backup</b> inside a visit to keep a copy elsewhere.</p>
+  </main>`;
+}
+
+function editHTML(){
+  const v=S.cur,m=v.meta,sg=v.sign;
+  return `<header class="bar"><div class="in">
+    <button class="btn ghost sm" data-a="home" aria-label="Back to visits">‹ Visits</button>
+    <h1>${esc(m.client||"New visit")}</h1><span class="save" id="saveState"></span>
+    <button class="btn pri sm" data-a="report">Report</button></div></header>
+  <main class="wrap">
+    <section class="card">
+      <div class="grid">
+        ${fld("m","client","Client",m.client,"e.g. Acme Ltd")}
+        ${fld("m","site","Site",m.site,"e.g. London HQ")}
+        <label class="f">Date of visit<input type="date" data-m="date" value="${esc(m.date)}"></label>
+        ${fld("m","engineer","Engineer",m.engineer,"Name")}
+        ${fld("m","ref","Reference",m.ref,"Job or quote number")}
+      </div>
+      <label class="f" style="margin-top:10px">General notes<textarea data-m="notes" placeholder="Anything that applies to the whole visit">${esc(m.notes)}</textarea></label>
+      <div class="row" style="margin-top:10px">
+        <button class="btn sm" data-a="drive">Save to Google Drive</button>
+        <button class="btn sm" data-a="backup">Save backup file</button>
+        <button class="btn sm" data-a="lib">Device library</button>
+      </div>
+      ${v.drive.uploaded?`<p class="muted small" style="margin:8px 0 0">Last saved to Google Drive ${esc(ukDateTime(v.drive.uploaded))}</p>`:""}
+    </section>
+    ${v.rooms.map(roomHTML).join("")}
+    <button class="big-add" data-a="addroom">+ Add room</button>
+    <section class="card" style="margin-top:20px">
+      <h2>Sign-off</h2>
+      <div class="sigs">
+        <div>${fld("sg","engName","Engineer name",sg.engName,m.engineer||"Name")}
+          <div class="sigpad" style="margin-top:8px"><canvas data-sig="engSig" aria-label="Engineer signature"></canvas>${sg.engSig?"":'<span class="hint">Engineer signs here</span>'}</div>
+          <button class="btn sm" data-a="clearsig" data-k="engSig" style="margin-top:6px">Clear signature</button></div>
+        <div>${fld("sg","cliName","Client name",sg.cliName,"Name and role")}
+          <div class="sigpad" style="margin-top:8px"><canvas data-sig="cliSig" aria-label="Client signature"></canvas>${sg.cliSig?"":'<span class="hint">Client signs here</span>'}</div>
+          <button class="btn sm" data-a="clearsig" data-k="cliSig" style="margin-top:6px">Clear signature</button></div>
+      </div>
+      <label class="f" style="margin-top:10px;max-width:220px">Date signed<input type="date" data-sg="date" value="${esc(sg.date)}"></label>
+    </section>
+  </main>`;
+}
+const fld=(ns,k,l,val,ph)=>`<label class="f">${l}<input type="text" data-${ns}="${k}" value="${esc(val)}" placeholder="${esc(ph)}"></label>`;
+
+function roomHTML(r){
+  return `<section class="card" data-room="${r.id}">
+    <div class="room-h">
+      <button class="tog" data-a="toggle" aria-expanded="${r.open}" aria-label="${r.open?"Collapse":"Expand"} room">${r.open?"▲":"▼"}</button>
+      <input type="text" data-r="name" value="${esc(r.name)}" placeholder="Room or location name" aria-label="Room name">
+    </div>
+    <p class="counts">${countsText(roomCounts(r))}</p>
+    ${r.open?`
+      ${r.devices.map(devHTML).join("")}
+      <div class="add-dev">
+        <select data-sel="addtype" aria-label="Device type to add">${S.lib.map(t=>`<option value="${t.id}">${esc(t.name)}</option>`).join("")}</select>
+        <button class="btn" data-a="adddev">Add device</button>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <button class="btn sm" data-a="duproom">Duplicate room</button>
+        <button class="btn sm del" data-a="delroom">Remove room</button>
+      </div>`:""}
+  </section>`;
+}
+
+function devHTML(d){
+  const a=d.asset,filled=ASSET.filter(([k])=>a[k]).length;
+  return `<div class="dev" data-dev="${d.id}">
+    <div class="dev-h"><b>${esc(d.type)}</b>
+      <input type="text" data-d="label" value="${esc(d.label)}" placeholder="Label or position (optional)" aria-label="Device label">
+      <button class="btn sm del" data-a="deldev">Remove</button></div>
+    <details class="asset" data-assetbox ${d.assetOpen?"open":""}><summary>Asset details${filled?` (${filled} of ${ASSET.length} filled)`:""}</summary>
+      <div class="grid">${ASSET.map(([k,l])=>`<label class="f">${l}<input type="text" data-asset="${k}" value="${esc(a[k])}"></label>`).join("")}</div>
+    </details>
+    ${d.checks.map(chkHTML).join("")}
+    <div class="addchk"><input type="text" placeholder="Add a check to this device" aria-label="New check name"><button class="btn sm" data-a="addchk">Add</button></div>
+  </div>`;
+}
+
+function faultHTML(k){
+  if(k.status==="fixed")return `<div class="fault"><label class="f wide">Action taken<textarea data-k="action" placeholder="What was done to fix it">${esc(k.action)}</textarea></label></div>`;
+  if(k.status!=="attn"&&k.status!=="remedial")return"";
+  return `<div class="fault">
+    <label class="f wide">Action taken${k.status==="remedial"?" (temporary fix)":""}<textarea data-k="action" placeholder="${k.status==="remedial"?"What was done on site":"Anything done so far (optional)"}">${esc(k.action)}</textarea></label>
+    <label class="f wide">Recommendation<textarea data-k="recommendation" placeholder="What should happen next">${esc(k.recommendation)}</textarea></label>
+    <label class="f">Owner<input type="text" data-k="owner" value="${esc(k.owner)}" placeholder="e.g. Our team, client IT"></label>
+    <label class="f">Target date<input type="date" data-k="target" value="${esc(k.target)}"></label>
+  </div>`;
+}
+function chkHTML(k){
+  const fault=k.status==="attn"||k.status==="remedial";
+  return `<div class="chk" data-chk="${k.id}" data-s="${k.status}">
+    <div class="chk-h"><span class="nm">${esc(k.name)}</span>
+      <div class="seg" role="group" aria-label="Status for ${esc(k.name)}">
+        ${STATUSES.map(([v,l,sh,tip])=>`<button data-a="status" data-v="${v}" aria-label="${l}" title="${tip}" aria-pressed="${k.status===v}">${sh}</button>`).join("")}
+      </div></div>
+    <textarea data-k="comments" placeholder="${fault?"Fault description":"Comments"}" aria-label="Comments for ${esc(k.name)}">${esc(k.comments)}</textarea>
+    ${faultHTML(k)}
+    <div class="photo-btns">
+      <label>Take photo<input type="file" accept="image/*" capture="environment" data-a="photo"></label>
+      <label>Add from gallery<input type="file" accept="image/*" multiple data-a="photo"></label>
+      <button class="btn sm del" data-a="delchk" style="margin-left:auto">Remove check</button>
+    </div>
+    ${k.photos.length?`<div class="ph">${k.photos.map(p=>`<figure><img src="${p.data}" alt="Photo for ${esc(k.name)}"><button class="x" data-a="delphoto" data-pid="${p.id}" aria-label="Remove photo">×</button></figure>`).join("")}</div>`:""}
+  </div>`;
+}
+
+/* ---------- Signature pads ---------- */
+function initSigs(){
+  document.querySelectorAll("canvas[data-sig]").forEach(cv=>{
+    const key=cv.dataset.sig,sg=S.cur.sign,box=cv.getBoundingClientRect(),dpr=window.devicePixelRatio||1;
+    cv.width=Math.round(box.width*dpr);cv.height=Math.round(box.height*dpr);
+    const x=cv.getContext("2d");x.scale(dpr,dpr);x.lineWidth=2.2;x.lineCap="round";x.lineJoin="round";x.strokeStyle="#1c2733";
+    if(sg[key]){const im=new Image();im.onload=()=>x.drawImage(im,0,0,box.width,box.height);im.src=sg[key]}
+    let down=false;const pt=e=>{const b=cv.getBoundingClientRect();return[e.clientX-b.left,e.clientY-b.top]};
+    cv.onpointerdown=e=>{down=true;cv.setPointerCapture(e.pointerId);const[a,b]=pt(e);x.beginPath();x.moveTo(a,b);x.lineTo(a+.1,b+.1);x.stroke();
+      cv.parentElement.querySelector(".hint")?.remove();e.preventDefault()};
+    cv.onpointermove=e=>{if(!down)return;const[a,b]=pt(e);x.lineTo(a,b);x.stroke();e.preventDefault()};
+    const up=()=>{if(!down)return;down=false;sg[key]=cv.toDataURL("image/png");touch()};
+    cv.onpointerup=up;cv.onpointercancel=up;
+  });
+}
+
+/* ---------- Library ---------- */
+function libHTML(){
+  return `<header class="bar"><div class="in">
+    <button class="btn ghost sm" data-a="back">‹ Back</button><h1>Device library</h1></div></header>
+  <main class="wrap">
+    <p class="muted small">Device types and their checks, used when you add a device to a room. Changes apply to devices added from now on; devices already in a visit keep their own checks, which you can edit in the room.</p>
+    <section class="card">
+      ${S.lib.map(t=>`<div class="lib-type" data-type="${t.id}">
+        <div class="row"><input type="text" data-l="name" value="${esc(t.name)}" aria-label="Device type name" style="flex:1;font-weight:700">
+        <button class="btn sm del" data-a="deltype">Remove type</button></div>
+        ${t.checks.map((c,i)=>`<div class="lib-chk"><input type="text" data-lc="${i}" value="${esc(c)}" aria-label="Check name"><button class="btn sm del" data-a="dellibchk" data-i="${i}" aria-label="Remove check">×</button></div>`).join("")}
+        <button class="btn sm" data-a="addlibchk">+ Add check</button>
+      </div>`).join("")||`<p class="empty">No device types. Add one below.</p>`}
+    </section>
+    <div class="row"><button class="btn pri" data-a="addtype">+ Add device type</button>
+    <button class="btn" data-a="resetlib">Reset to defaults</button></div>
+  </main>`;
+}
+
+/* ---------- Settings (Google Drive) ---------- */
+function driveCfg(){return{clientId:(S.drive.clientId||CFG.googleClientId||"").trim(),folderId:(S.drive.folderId||CFG.driveFolderId||"").trim()}}
+function settingsHTML(){
+  const c=driveCfg(),fromFile=!S.drive.clientId&&CFG.googleClientId;
+  return `<header class="bar"><div class="in">
+    <button class="btn ghost sm" data-a="back">‹ Back</button><h1>Settings</h1></div></header>
+  <main class="wrap">
+    <section class="card">
+      <h2>Google Drive</h2>
+      <p class="muted small" style="margin-top:0">Reports and backups are uploaded to one shared folder. Each person signs in with their own Google account, which needs edit access to that folder.</p>
+      ${fromFile?`<p class="note">Using the shared settings from config.js. Anything you enter here overrides them on this device.</p>`:""}
+      <label class="f">Google OAuth client ID<input type="text" data-set="clientId" value="${esc(S.drive.clientId)}" placeholder="${esc(CFG.googleClientId||"…apps.googleusercontent.com")}"></label>
+      <label class="f" style="margin-top:10px">Drive folder link or ID<input type="text" data-set="folderId" value="${esc(S.drive.folderId)}" placeholder="${esc(CFG.driveFolderId||"https://drive.google.com/drive/folders/…")}"></label>
+      <div class="row" style="margin-top:12px"><button class="btn pri" data-a="savesettings">Save</button><button class="btn" data-a="testdrive">Test connection</button></div>
+      ${S.drive.folderName?`<p class="small" style="margin-bottom:0">Connected folder: <b>${esc(S.drive.folderName)}</b></p>`:""}
+      ${c.clientId?"":`<p class="muted small" style="margin-bottom:0">Not set up yet. See the README for how to create a client ID.</p>`}
+    </section>
+  </main>`;
+}
+function parseFolder(s){s=(s||"").trim();const m=s.match(/folders\/([\w-]+)/)||s.match(/[?&]id=([\w-]+)/);return m?m[1]:s}
+
+/* ---------- Google sign-in and Drive upload ---------- */
+let tokenClient=null,tokenCid="",token="",tokenExp=0,tokHandlers={};
+function loadGIS(){
+  if(window.google?.accounts?.oauth2)return Promise.resolve();
+  if(loadGIS.p)return loadGIS.p;
+  return loadGIS.p=new Promise((res,rej)=>{const s=document.createElement("script");s.src="https://accounts.google.com/gsi/client";s.async=true;
+    s.onload=()=>res();s.onerror=()=>{loadGIS.p=null;s.remove();rej(new Error("Could not reach Google. Check the internet connection."))};document.head.appendChild(s)});
+}
+/* Must be called directly from a tap (before any await) so the sign-in pop-up is allowed. */
+function getToken(){
+  const {clientId}=driveCfg();
+  if(!clientId)return Promise.reject(new Error("Google Drive is not set up. Open Settings and add the client ID."));
+  if(token&&Date.now()<tokenExp-60000)return Promise.resolve(token);
+  if(!window.google?.accounts?.oauth2){loadGIS().catch(()=>{});return Promise.reject(new Error(navigator.onLine?"Connecting to Google. Tap the button again in a moment.":"No internet connection. The visit is saved on this device; save to Drive when back online."))}
+  if(!tokenClient||tokenCid!==clientId){
+    tokenClient=google.accounts.oauth2.initTokenClient({client_id:clientId,scope:DRIVE_SCOPE,
+      callback:r=>tokHandlers.ok&&tokHandlers.ok(r),error_callback:e=>tokHandlers.err&&tokHandlers.err(e)});tokenCid=clientId}
+  return new Promise((res,rej)=>{
+    tokHandlers={ok:r=>{if(r.error){rej(new Error("Google sign-in failed: "+(r.error_description||r.error)));return}
+      if(!google.accounts.oauth2.hasGrantedAllScopes(r,DRIVE_SCOPE)){rej(new Error("Google Drive access was not allowed. Tap again and tick the Drive permission."));return}
+      token=r.access_token;tokenExp=Date.now()+(+r.expires_in||3600)*1000;res(token)},
+      err:e=>rej(new Error(e&&e.type==="popup_closed"?"The Google sign-in window was closed.":"The Google sign-in window could not open. Allow pop-ups for this site and try again."))};
+    tokenClient.requestAccessToken({prompt:""});
+  });
+}
+async function gfetch(url,opt={}){
+  const r=await fetch(url,{...opt,headers:{...(opt.headers||{}),Authorization:"Bearer "+token}});
+  if(r.status===401){token="";throw new Error("Google sign-in expired. Tap the button again.")}
+  return r;
+}
+async function driveErr(r,what){let msg="";try{msg=(await r.json()).error.message}catch(e){}
+  if(r.status===404)return new Error(`${what}: the Drive folder was not found, or your Google account has no access to it.`);
+  if(r.status===403)return new Error(`${what}: Google refused access (${msg||"403"}). Check you have edit access to the folder.`);
+  return new Error(`${what}: ${msg||"error "+r.status}`)}
+async function checkFolder(folderId){
+  const r=await gfetch(`https://www.googleapis.com/drive/v3/files/${encodeURIComponent(folderId)}?fields=id,name,mimeType,capabilities(canAddChildren)&supportsAllDrives=true`);
+  if(!r.ok)throw await driveErr(r,"Folder check failed");
+  const f=await r.json();
+  if(f.mimeType!=="application/vnd.google-apps.folder")throw new Error("That link is a file, not a folder. Use the link of the shared folder.");
+  if(f.capabilities&&f.capabilities.canAddChildren===false)throw new Error(`You can view "${f.name}" but cannot add files to it. Ask the owner for editor access.`);
+  return f;
+}
+async function uploadFile(name,blob,existingId,folderId){
+  const b="mvr"+uid(),meta=existingId?{name}:{name,parents:[folderId]};
+  const body=new Blob([`--${b}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify(meta)}\r\n--${b}\r\nContent-Type: ${blob.type}\r\n\r\n`,blob,`\r\n--${b}--`]);
+  const q="uploadType=multipart&supportsAllDrives=true&fields=id";
+  let r=await gfetch(existingId?`https://www.googleapis.com/upload/drive/v3/files/${encodeURIComponent(existingId)}?${q}`:`https://www.googleapis.com/upload/drive/v3/files?${q}`,
+    {method:existingId?"PATCH":"POST",headers:{"Content-Type":`multipart/related; boundary=${b}`},body});
+  if(existingId&&(r.status===404||r.status===403))return uploadFile(name,blob,null,folderId); // file deleted or moved: create a new one
+  if(!r.ok)throw await driveErr(r,"Upload failed");
+  return (await r.json()).id;
+}
+async function saveToDrive(){
+  const tp=getToken(); // first, while the tap is still active
+  let t;try{t=await tp}catch(e){toast(e.message,5000);return}
+  const {folderId}=driveCfg();if(!folderId){toast("No Drive folder set. Open Settings and add the folder link.",5000);return}
+  const v=S.cur;await flush();
+  toast("Saving to Google Drive…",20000);
+  try{
+    const base=fileBase(v);
+    v.drive.reportId=await uploadFile(base+".html",new Blob([reportFile(v)],{type:"text/html"}),v.drive.reportId,folderId);
+    v.drive.backupId=await uploadFile(base+" backup.json",new Blob([JSON.stringify(v)],{type:"application/json"}),v.drive.backupId,folderId);
+    v.drive.uploaded=Date.now();S.saved=false;await flush();render();
+    toast("Saved to Google Drive: report and backup");
+  }catch(e){toast(e.message,6000)}
+}
+
+/* ---------- Report ---------- */
+function itemCell(r,d,k){return `<b>${esc(k.name)}</b><span class="sub">${esc(r.name)}, ${esc(devName(d))}</span>`}
+function kv(l,v){return v?`<span class="kv"><b>${l}:</b> <span class="wrapcell">${esc(v)}</span></span>`:""}
+function reportBody(v){
+  const m=v.meta,sg=v.sign||{},all=allChecks(v),c=ZERO();all.forEach(x=>c[x[2].status]++);
+  const pill=s=>`<span class="pill p-${s}">${LABEL[s]}</span>`;
+  const photos=k=>k.photos.length?`<div class="rphotos">${k.photos.map(p=>`<img src="${p.data}" alt="">`).join("")}</div>`:"";
+  const meta=[["Client",m.client],["Site",m.site],["Date of visit",ukDate(m.date)],["Engineer",m.engineer],["Reference",m.ref]].filter(x=>x[1]);
+  const open=all.filter(x=>x[2].status==="attn"||x[2].status==="remedial");
+  const done=all.filter(x=>x[2].status==="fixed"||x[2].status==="remedial");
+  let h=`<h1>Maintenance visit report</h1>${m.site||m.client?`<div class="muted">${esc([m.client,m.site].filter(Boolean).join(", "))}</div>`:""}
+  ${meta.length?`<dl>${meta.map(([k,x])=>`<div><dt>${k}</dt><dd>${esc(x)}</dd></div>`).join("")}</dl>`:""}
+  <h2>Summary</h2><div class="stats"><div><b>${v.rooms.length}</b>rooms</div><div><b>${all.length}</b>checks</div>
+    ${STATUSES.filter(s=>s[0]!=="unchecked"||c.unchecked).map(([s,l])=>`<div><b style="color:var(--${{ok:"ok",attn:"attn",remedial:"rem",fixed:"fix",na:"na",unchecked:"ink2"}[s]})">${c[s]}</b>${l}</div>`).join("")}</div>
+  ${m.notes?`<p class="wrapcell">${esc(m.notes)}</p>`:""}`;
+  if(open.length)h+=`<h2>Items needing attention</h2><table><thead><tr><th style="width:26%">Item</th><th>Issue and recommendation</th><th style="width:22%">Owner / target</th></tr></thead><tbody>
+    ${open.map(([r,d,k])=>`<tr><td>${itemCell(r,d,k)}<div style="margin-top:4px">${pill(k.status)}</div></td>
+      <td>${k.comments?`<div class="wrapcell">${esc(k.comments)}</div>`:'<span class="muted">No description</span>'}${k.status==="remedial"?kv("Temporary fix",k.action):kv("Action so far",k.action)}${kv("Recommendation",k.recommendation)}</td>
+      <td>${esc(k.owner)||'<span class="muted">Not set</span>'}${k.target?`<span class="sub">by ${esc(ukDate(k.target))}</span>`:""}</td></tr>`).join("")}</tbody></table>`;
+  if(done.length)h+=`<h2>Work completed on this visit</h2><table><thead><tr><th style="width:26%">Item</th><th style="width:16%">Status</th><th>Action taken</th></tr></thead><tbody>
+    ${done.map(([r,d,k])=>`<tr><td>${itemCell(r,d,k)}</td><td>${pill(k.status)}</td><td class="wrapcell">${esc(k.action||k.comments)||'<span class="muted">Not recorded</span>'}</td></tr>`).join("")}</tbody></table>`;
+  v.rooms.forEach(r=>{
+    h+=`<h2>${esc(r.name||"Unnamed room")}</h2>`;
+    if(!r.devices.length){h+=`<p class="muted">No devices recorded for this room.</p>`;return}
+    r.devices.forEach(d=>{
+      const a=d.asset||{},rows=[["Make",a.make],["Model",a.model],["Serial number",a.serial],["Firmware",a.fwBefore||a.fwAfter?(a.fwBefore&&a.fwAfter&&a.fwBefore!==a.fwAfter?`${a.fwBefore} → ${a.fwAfter}`:(a.fwAfter||a.fwBefore)):""]].filter(x=>x[1]);
+      h+=`<div class="devblock"><h3>${esc(devName(d))}</h3>${rows.length?`<dl class="asset">${rows.map(([k,x])=>`<div><dt>${k}</dt><dd>${esc(x)}</dd></div>`).join("")}</dl>`:""}`;
+      h+=d.checks.length?`<table><thead><tr><th style="width:28%">Check</th><th style="width:18%">Status</th><th>Details</th></tr></thead><tbody>
+        ${d.checks.map(k=>`<tr><td>${esc(k.name)}</td><td>${pill(k.status)}</td><td><div class="wrapcell">${esc(k.comments)}</div>
+          ${["attn","remedial","fixed"].includes(k.status)?kv("Action taken",k.action)+(k.status!=="fixed"?kv("Recommendation",k.recommendation)+kv("Owner",k.owner)+kv("Target date",ukDate(k.target)):""):""}${photos(k)}</td></tr>`).join("")}
+        </tbody></table>`:`<p class="muted">No checks.</p>`;
+      h+=`</div>`;
+    });
+  });
+  const engName=sg.engName||m.engineer;
+  h+=`<h2>Sign-off</h2><div class="rsign">
+    <div><dl style="margin:0 0 8px"><div><dt>Engineer</dt><dd>${esc(engName)||"&nbsp;"}</dd></div></dl>${sg.engSig?`<img src="${sg.engSig}" alt="Engineer signature">`:'<div class="blank"></div>'}</div>
+    <div><dl style="margin:0 0 8px"><div><dt>Client</dt><dd>${esc(sg.cliName)||"&nbsp;"}</dd></div></dl>${sg.cliSig?`<img src="${sg.cliSig}" alt="Client signature">`:'<div class="blank"></div>'}</div>
+  </div>${sg.date?`<p class="small">Date signed: <b>${esc(ukDate(sg.date))}</b></p>`:""}`;
+  return h+`<div class="end">End of report</div>`;
+}
+function reportPage(){
+  return `<header class="bar noprint"><div class="in">
+    <button class="btn ghost sm" data-a="back">‹ Edit</button><h1>Report preview</h1>
+    <button class="btn ghost sm" data-a="drive">Save to Drive</button>
+    <button class="btn ghost sm" data-a="saverep">Save file</button>
+    <button class="btn pri sm" data-a="print">Print / PDF</button></div></header>
+  <article class="rep">${reportBody(S.cur)}</article>`;
+}
+function reportFile(v){
+  const css=[...document.querySelectorAll("style")].map(s=>s.textContent).join("\n");
+  return `<!DOCTYPE html><html lang="en-GB"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${esc(fileBase(v))}</title><style>${css}</style></head><body><article class="rep">${reportBody(v)}</article></body></html>`;
+}
+function fileBase(v){const m=v.meta;return ["Maintenance visit",m.client,m.site,m.date].filter(Boolean).join(" ").replace(/[\\/:*?"<>|]+/g,"-").trim()}
+
+/* ---------- Save / share files on the device ---------- */
+async function deliver(blob,name){
+  const file=new File([blob],name,{type:blob.type});
+  if(navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file],title:name});return}catch(e){if(e.name==="AbortError")return}}
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500);
+}
+
+/* ---------- Events ---------- */
+const ctx=el=>{const roomEl=el.closest("[data-room]"),devEl=el.closest("[data-dev]"),chkEl=el.closest("[data-chk]");
+  const r=roomEl&&findRoom(roomEl.dataset.room),d=r&&devEl&&r.devices.find(x=>x.id===devEl.dataset.dev),k=d&&chkEl&&d.checks.find(x=>x.id===chkEl.dataset.chk);
+  return{roomEl,devEl,chkEl,r,d,k}};
+
+app.addEventListener("input",e=>{
+  const t=e.target,ds=t.dataset;
+  if(ds.m!==undefined){S.cur.meta[ds.m]=t.value;touch();if(ds.m==="client"){const h=document.querySelector(".bar h1");if(h)h.textContent=t.value||"New visit"}return}
+  if(ds.sg!==undefined){S.cur.sign[ds.sg]=t.value;touch();return}
+  if(ds.set!==undefined)return;
+  const {r,d,k}=ctx(t);
+  if(ds.r==="name"&&r){r.name=t.value;touch();return}
+  if(ds.d==="label"&&d){d.label=t.value;touch();return}
+  if(ds.asset&&d){d.asset[ds.asset]=t.value;touch();return}
+  if(ds.k&&k){k[ds.k]=t.value;touch();return}
+  const typeEl=t.closest("[data-type]");
+  if(typeEl){const ty=S.lib.find(x=>x.id===typeEl.dataset.type);if(ds.l==="name")ty.name=t.value;if(ds.lc!==undefined)ty.checks[+ds.lc]=t.value;saveLib()}
+});
+app.addEventListener("toggle",e=>{if(e.target.matches("[data-assetbox]")){const {d}=ctx(e.target);if(d)d.assetOpen=e.target.open}},true);
+
+app.addEventListener("change",async e=>{
+  const t=e.target;
+  if(t.dataset.a==="photo"){
+    const files=[...t.files];t.value="";if(!files.length)return;
+    const {k}=ctx(t);toast(files.length>1?`Adding ${files.length} photos…`:"Adding photo…");
+    for(const f of files){try{k.photos.push({id:uid(),data:await compress(f)})}catch(err){toast(err.message)}}
+    touch();render();toast(files.length>1?`${files.length} photos added`:"Photo added",1500);return;
+  }
+  if(t.dataset.a==="import"){
+    const f=t.files[0];t.value="";if(!f)return;
+    try{const v=JSON.parse(await f.text());
+      if(!v||!v.meta||!Array.isArray(v.rooms))throw new Error("This file is not a maintenance visit backup.");
+      fixVisit(v);
+      if(S.visits.some(x=>x.id===v.id)&&!confirm("This visit is already on this device. Replace it with the backup? Choose Cancel to keep both."))v.id=uid();
+      v.updated=Date.now();await dbPut(v);S.visits=await dbGetAll();toast("Backup opened");render();
+    }catch(err){toast(err.message.startsWith("This file")?err.message:"Could not open that file. Choose a .json backup saved from this app.")}
+  }
+});
+
+app.addEventListener("click",async e=>{
+  const b=e.target.closest("[data-a]");if(!b||b.tagName==="INPUT")return;
+  const a=b.dataset.a,{roomEl,chkEl,r,d,k}=ctx(b);
+  switch(a){
+    case "drive":saveToDrive();break;
+    case "new":S.cur=newVisit();S.saved=false;await flush();S.visits=await dbGetAll();go("edit");break;
+    case "open":S.cur=fixVisit(S.visits.find(v=>v.id===b.dataset.id));S.saved=true;go("edit");break;
+    case "delvisit":{const v=S.visits.find(x=>x.id===b.dataset.id);
+      if(confirm(`Delete "${v.meta.client||"Untitled visit"}" from this device? Copies already saved to Google Drive or as backup files are not affected.`)){await dbDel(v.id);S.visits=await dbGetAll();render()}break}
+    case "home":await flush();S.visits=await dbGetAll();S.cur=null;go("home");break;
+    case "lib":S.from=S.view;go("lib");break;
+    case "settings":S.from=S.view;go("settings");break;
+    case "back":
+      if(S.view==="lib"){S.lib.forEach(t=>t.checks=t.checks.map(c=>c.trim()).filter(Boolean));saveLib();go(S.from)}
+      else if(S.view==="settings")go(S.from);
+      else go("edit");break;
+    case "report":await flush();go("report");break;
+    case "print":window.print();break;
+    case "saverep":await deliver(new Blob([reportFile(S.cur)],{type:"text/html"}),fileBase(S.cur)+".html");break;
+    case "backup":await flush();await deliver(new Blob([JSON.stringify(S.cur)],{type:"application/json"}),fileBase(S.cur)+" backup.json");break;
+    case "addroom":S.cur.rooms.forEach(x=>x.open=false);S.cur.rooms.push({id:uid(),name:`Room ${S.cur.rooms.length+1}`,open:true,devices:[]});touch();render();
+      document.querySelector(`[data-room="${S.cur.rooms.at(-1).id}"]`)?.scrollIntoView({block:"start"});break;
+    case "toggle":r.open=!r.open;touch();render();break;
+    case "delroom":if(confirm(`Remove ${r.name||"this room"} and everything recorded in it?`)){S.cur.rooms=S.cur.rooms.filter(x=>x!==r);touch();render()}break;
+    case "duproom":{const c=JSON.parse(JSON.stringify(r));c.id=uid();c.name=r.name+" (copy)";c.open=true;
+      c.devices.forEach(dv=>{dv.id=uid();dv.asset={};dv.label="";dv.checks=dv.checks.map(ck=>newCheck(ck.name))});
+      r.open=false;S.cur.rooms.splice(S.cur.rooms.indexOf(r)+1,0,c);touch();render();toast("Room duplicated with the same devices and checks; statuses, asset details and notes cleared");break}
+    case "adddev":{const ty=S.lib.find(x=>x.id===roomEl.querySelector("[data-sel=addtype]").value);
+      if(!ty){toast("Add a device type in the device library first");break}r.devices.push(deviceFromType(ty));touch();render();break}
+    case "deldev":if(confirm(`Remove ${devName(d)} and its checks from ${r.name}?`)){r.devices=r.devices.filter(x=>x!==d);touch();render()}break;
+    case "addchk":{const inp=b.previousElementSibling,n=inp.value.trim();if(!n){inp.focus();break}d.checks.push(newCheck(n));touch();render();break}
+    case "delchk":if((!k.comments&&!k.photos.length&&!k.action)||confirm(`Remove "${k.name}" and its notes and photos?`)){d.checks=d.checks.filter(x=>x!==k);touch();render()}break;
+    case "status":{k.status=b.dataset.v;const html=chkHTML(k);chkEl.outerHTML=html;roomEl.querySelector(".counts").textContent=countsText(roomCounts(r));touch();
+      document.querySelector(`[data-chk="${k.id}"] [data-v="${k.status}"]`)?.focus({preventScroll:true});break}
+    case "delphoto":if(confirm("Remove this photo?")){k.photos=k.photos.filter(p=>p.id!==b.dataset.pid);touch();render()}break;
+    case "clearsig":S.cur.sign[b.dataset.k]="";touch();render();break;
+    /* library */
+    case "addtype":S.lib.push({id:uid(),name:"New device type",checks:["Operation"]});saveLib();render();
+      document.querySelector(`[data-type="${S.lib.at(-1).id}"] input`)?.select();break;
+    case "deltype":{const ty=S.lib.find(x=>x.id===b.closest("[data-type]").dataset.type);
+      if(confirm(`Remove "${ty.name}" from the library? Devices already added to visits are not affected.`)){S.lib=S.lib.filter(x=>x!==ty);saveLib();render()}break}
+    case "addlibchk":{const ty=S.lib.find(x=>x.id===b.closest("[data-type]").dataset.type);ty.checks.push("");saveLib();render();
+      [...document.querySelectorAll(`[data-type="${ty.id}"] .lib-chk input`)].at(-1)?.focus();break}
+    case "dellibchk":{const ty=S.lib.find(x=>x.id===b.closest("[data-type]").dataset.type);ty.checks.splice(+b.dataset.i,1);saveLib();render();break}
+    case "resetlib":if(confirm("Replace the device library with the default list? Your custom types and checks will be removed from the library (not from existing visits).")){S.lib=libFromDefaults();saveLib();render()}break;
+    /* settings */
+    case "savesettings":{const ci=app.querySelector("[data-set=clientId]").value.trim(),fo=parseFolder(app.querySelector("[data-set=folderId]").value);
+      if(ci!==S.drive.clientId){token="";tokenClient=null}
+      if(fo!==S.drive.folderId)S.drive.folderName="";
+      S.drive.clientId=ci;S.drive.folderId=fo;await setPut("drive",S.drive);if(driveCfg().clientId)loadGIS().catch(()=>{});render();toast("Settings saved");break}
+    case "testdrive":{
+      const tp=getToken();let t;try{t=await tp}catch(err){toast(err.message,5000);break}
+      const {folderId}=driveCfg();if(!folderId){toast("Add the Drive folder link first, then Save.",5000);break}
+      try{const f=await checkFolder(folderId);S.drive.folderName=f.name;await setPut("drive",S.drive);render();toast(`Connected. Files will be saved to "${f.name}".`,5000)}
+      catch(err){toast(err.message,6000)}break}
+  }
+});
+app.addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.closest(".addchk")){e.preventDefault();e.target.nextElementSibling.click()}});
+
+/* ---------- Start ---------- */
+(async()=>{
+  try{DB=await openDB()}catch(e){app.innerHTML=`<main class="wrap"><div class="card">This browser blocked local storage, so visits cannot be saved. Open the app in a normal (not private) browser window.</div></main>`;return}
+  const stored=await setGet("lib"),ver=await setGet("libVersion");
+  if(!stored)S.lib=libFromDefaults();
+  else{S.lib=stored;
+    if(ver!==LIB_VERSION){ // one-off: add new default types and checks, keep everything the user already has
+      DEFAULT_LIB.forEach(dt=>{const t=S.lib.find(x=>x.name.trim().toLowerCase()===dt.name.toLowerCase());
+        if(!t)S.lib.push({id:uid(),name:dt.name,checks:[...dt.checks]});
+        else dt.checks.forEach(c=>{if(!t.checks.some(x=>x.trim().toLowerCase()===c.toLowerCase()))t.checks.push(c)})})}}
+  await saveLib();await setPut("libVersion",LIB_VERSION);
+  S.drive=Object.assign(S.drive,(await setGet("drive"))||{});
+  S.visits=(await dbGetAll()).map(fixVisit);render();
+  if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
+  if("serviceWorker" in navigator&&location.protocol.startsWith("http"))navigator.serviceWorker.register("sw.js").catch(()=>{});
+  if(driveCfg().clientId&&navigator.onLine)loadGIS().catch(()=>{});
+  window.addEventListener("online",()=>{if(driveCfg().clientId)loadGIS().catch(()=>{})});
+})();
+</script>
+</body>
+</html>
