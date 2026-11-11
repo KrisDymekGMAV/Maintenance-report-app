@@ -1,5 +1,5 @@
 // Bump this version whenever you change any file, so installed copies pick up the update.
-const CACHE = "mvr-v2";
+const CACHE = "mvr-v3";
 const FILES = ["./", "./index.html", "./config.js", "./manifest.webmanifest",
   "./icons/icon-192.png", "./icons/icon-512.png", "./icons/icon-maskable-512.png"];
 
